@@ -15,7 +15,7 @@ public class ChatService extends ChatServiceGrpc.ChatServiceImplBase {
     @Override
     public void sendMessage(ChatApp.SendMessageRequest request, StreamObserver<ChatApp.SendMessageResponse> responseObserver) {
         try {
-            System.out.println("Relax bro, I'm working =)");
+            System.out.println("Message received.");
             messages.add(ChatApp.SendMessageResponse.newBuilder().setMessage(request.getMessage()).setMessageId(messages.size()).setTimestamp(Instant.now().getEpochSecond()).build());
             messages.forEach(m ->
                     responseObserver.onNext(m));
