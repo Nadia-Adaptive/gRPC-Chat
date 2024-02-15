@@ -1,0 +1,32 @@
+plugins {
+    id 'com.wearadaptive.grpcchat.java-common-conventions'
+    id 'com.google.protobuf' version '0.9.2'
+    id 'idea'
+}
+
+def protocVersion = '3.21.12'
+def grpcVersion = libs.versions.grpc.get()
+
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+
+// Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
+sourceSets {
+    main {
+        proto {
+            srcDir 'contract/src/main/proto'
+        }
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}

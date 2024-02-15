@@ -1,0 +1,12 @@
+plugins {
+    id 'com.wearadaptive.grpcchat.java-application-conventions'
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'SenderMain'
+}
+
+dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+}

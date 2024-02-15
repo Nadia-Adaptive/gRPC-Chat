@@ -1,0 +1,8 @@
+plugins {
+    id 'com.wearadaptive.grpcchat.java-application-conventions'
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'ReceiverMain'
+}
