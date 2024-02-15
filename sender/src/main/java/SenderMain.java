@@ -1,14 +1,10 @@
-import io.grpc.Channel;
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
-import io.grpc.ManagedChannel;
+import io.grpc.*;
 import io.grpc.stub.StreamObserver;
+
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class SenderMain {
-
-
     public static void main(String[] args) throws Exception {
         ManagedChannel channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build();
         ChatClient client = new ChatClient(channel);
@@ -25,7 +21,6 @@ public class SenderMain {
 
                 try {
                     client.sendMessage(message);
-
                 } catch (final Exception e) {
                     System.out.println(e.getMessage());
                 }
