@@ -1,0 +1,15 @@
+service ConnectionService{
+  rpc sendMessage(SendMessageRequest) returns (stream SendMessageResponse){}
+}
+
+message SendMessageRequest{
+  required int32 roomId = 1;
+  required int32 userId = 2;
+  required string message = 3;
+}
+
+message SendMessageResponse{
+  required int32 messageId = 1;
+  required int64 timestamp = 2;
+  required string message = 3;
+}

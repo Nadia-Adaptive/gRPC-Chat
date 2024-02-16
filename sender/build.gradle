@@ -1,5 +1,10 @@
 plugins {
     id 'com.wearadaptive.grpcchat.java-application-conventions'
+    id 'com.google.cloud.tools.jib' version '3.4.0'
+}
+jib.to.image = 'nadaptive/be_training'
+repositories{
+    mavenCentral()
 }
 
 application {
