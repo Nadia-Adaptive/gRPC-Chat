@@ -1,15 +1,13 @@
 package chatapp.server;
 
 import chatapp.user.User;
-import io.grpc.ServerTransportFilter;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerState {
+public class UserRepository {
     Map<Integer, User> connectedUsers;
 
-    public ServerState() {
+    public UserRepository() {
         connectedUsers = new HashMap<>();
     }
 

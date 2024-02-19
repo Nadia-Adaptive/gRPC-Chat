@@ -1,3 +1,5 @@
+package chatapp.chat;
+
 import chatapp.ChatService.ChatServiceGrpc;
 import chatapp.ChatService.ChatServiceOuterClass;
 import io.grpc.Channel;
@@ -7,21 +9,25 @@ public class ChatClient {
     ChatServiceGrpc.ChatServiceStub serviceStub;
     StreamObserver<ChatServiceOuterClass.MessageRequest> requestObserver;
 
-    public ChatClient(Channel channel) {
+    public ChatClient(final Channel channel) {
         serviceStub = ChatServiceGrpc.newStub(channel);
         requestObserver = serviceStub.sendMessage(new MessageObserver());
     }
 
-    void sendMessage(final String message, final int clientId) {
+    public void sendMessage(final String message, final int clientId) {
         try {
-            requestObserver.onNext(ChatServiceOuterClass.MessageRequest.newBuilder().setMessage(message).setRoomId(0).setUserId(clientId).build());
+            requestObserver.onNext(ChatServiceOuterClass.MessageRequest.newBuilder()
+                    .setMessage(message)
+                    .setRoomId(0)
+                    .setUserId(clientId)
+                    .build());
         } catch (final RuntimeException e) {
             requestObserver.onError(e);
             throw e;
         }
     }
 
-    void closeClient() {
+    public void closeClient() {
         requestObserver.onCompleted();
     }
 }

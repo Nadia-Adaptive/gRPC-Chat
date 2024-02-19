@@ -1,17 +1,16 @@
+package chatapp.chat;
+
 import chatapp.ChatService.ChatServiceOuterClass;
 
-import java.awt.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MessageObserver implements io.grpc.stub.StreamObserver<ChatServiceOuterClass.MessageResponse> {
-    public void onNext(ChatServiceOuterClass.MessageResponse value) {
+    public void onNext(final ChatServiceOuterClass.MessageResponse value) {
         printMessage(value);
     }
 
     @Override
-    public void onError(Throwable t) {
+    public void onError(final Throwable t) {
         System.out.println(t.getMessage());
     }
 
