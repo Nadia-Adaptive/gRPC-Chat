@@ -6,6 +6,7 @@ services:
     image: nadaptive/be_training:server
     environment:
       - CHAT_APP
+      - CHAT_PORT=50052
     ports:
       - "50051:50051"
 
@@ -15,6 +16,7 @@ services:
     image: nadaptive/be_training:latest
     environment:
       - CHAT_APP
+      - CHAT_PORT=50052
     tty: true
     stdin_open: true
 
@@ -24,6 +26,7 @@ services:
     image: nadaptive/be_training:latest
     environment:
       - CHAT_APP
+      - CHAT_PORT=50052
     tty: true
     stdin_open: true
 

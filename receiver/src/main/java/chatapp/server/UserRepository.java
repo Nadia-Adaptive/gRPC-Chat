@@ -23,5 +23,9 @@ public class UserRepository {
             return null;
         }
     }
+
+    public User findById(final int userId) {
+        return connectedUsers.get(userId);
+    }
 }
 

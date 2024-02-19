@@ -32,9 +32,11 @@ public class ChatServiceImpl extends ChatServiceGrpc.ChatServiceImplBase {
             public void onNext(final ChatServiceOuterClass.MessageRequest request) {
                 System.out.println("Message received.");
 
+                final var user = state.findById(request.getUserId());
+
                 messages.add(ChatServiceOuterClass.MessageResponse.newBuilder()
                         .setMessage(request.getMessage())
-                        .setMessageId(messages.size())
+                        .setUsername(user.username())
                         .setTimestamp(Instant.now().getEpochSecond())
                         .build());
 

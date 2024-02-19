@@ -34,6 +34,7 @@ public class ChatServer {
             }
         });
     }
+
     public void blockUntilShutdown() throws InterruptedException {
         if (server != null) {
             server.awaitTermination();

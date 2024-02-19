@@ -21,7 +21,7 @@ public class MessageObserver implements io.grpc.stub.StreamObserver<ChatServiceO
 
     void printMessage(final ChatServiceOuterClass.MessageResponse m) {
         System.out.println();
-        System.out.printf("%s [%s]%n", Instant.ofEpochSecond(m.getTimestamp()), m.getMessageId());
+        System.out.printf("%s [%s]%n", m.getUsername(), Instant.ofEpochSecond(m.getTimestamp()));
         System.out.println("\t" + m.getMessage());
     }
 }

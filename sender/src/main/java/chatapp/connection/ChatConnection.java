@@ -35,7 +35,6 @@ public class ChatConnection {
         clientId = stub.connect(
                 ConnectionServiceOuterClass.ConnectionRequest.newBuilder()
                         .setUsername(username)
-                        .setPassword("password")
                         .build())
                 .getClientId();
         System.out.println("Connected with client id of " + clientId);
