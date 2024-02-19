@@ -1,22 +1,23 @@
 import io.grpc.Channel;
+import io.grpc.stub.StreamObserver;
 
 import java.time.Instant;
 
 public class ChatClient {
-    ChatServiceGrpc.ChatServiceBlockingStub serviceStub;
+    ChatServiceGrpc.ChatServiceStub serviceStub;
+    StreamObserver responseObserver;
 
     public ChatClient(Channel channel) {
-        serviceStub = ChatServiceGrpc.newBlockingStub(channel);
+        serviceStub = ChatServiceGrpc.newStub(channel);
+        responseObserver = new MessageObserver();
     }
 
     void sendMessage(final String message) {
+        try{
         final var request = ChatApp.SendMessageRequest.newBuilder().setMessage(message).setRoomId(0).setUserId(0).build();
-        final var result = serviceStub.sendMessage(request);
-        while (result.hasNext()) {
-            final var response = result.next();
-            System.out.println();
-            System.out.println("%s [%s]".formatted(Instant.ofEpochSecond(response.getTimestamp()), response.getMessageId()));
-            System.out.println("\t" + response.getMessage());
+        serviceStub.sendMessage(request, responseObserver);
+        } catch (final Exception e){
+            System.out.println(e.getMessage());
         }
     }
 }
