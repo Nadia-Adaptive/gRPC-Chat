@@ -1,14 +1,16 @@
+option java_package = "chatapp.ChatService";
+
 service ChatService{
-  rpc sendMessage(SendMessageRequest) returns (stream SendMessageResponse){}
+  rpc sendMessage(stream MessageRequest) returns (stream MessageResponse){}
 }
 
-message SendMessageRequest{
+message MessageRequest{
   required int32 roomId = 1;
   required int32 userId = 2;
   required string message = 3;
 }
 
-message SendMessageResponse{
+message MessageResponse{
   required int32 messageId = 1;
   required int64 timestamp = 2;
   required string message = 3;
