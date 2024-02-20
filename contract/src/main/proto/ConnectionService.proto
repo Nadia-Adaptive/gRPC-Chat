@@ -1,0 +1,14 @@
+option java_package = "chatapp.ConnectionService";
+
+service ConnectionService{
+  rpc connect(ConnectionRequest) returns (ConnectionResponse){}
+}
+
+message ConnectionRequest {
+  required string username = 1;
+  required string password = 2;
+}
+
+message ConnectionResponse{
+  required int32 clientId = 1;
+}
