@@ -5,10 +5,9 @@ service ConnectionService{
 }
 
 message ConnectionRequest {
-  required string username = 1;
-  required string password = 2;
+  optional string username = 1;
 }
 
-message ConnectionResponse{
-  required int32 clientId = 1;
+message ConnectionResponse {
+  optional int32 clientId = 1;
 }
