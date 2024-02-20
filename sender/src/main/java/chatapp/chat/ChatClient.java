@@ -5,16 +5,20 @@ import chatapp.ChatService.ChatServiceOuterClass;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChatClient {
-    ChatServiceGrpc.ChatServiceStub serviceStub;
-    StreamObserver<ChatServiceOuterClass.MessageRequest> requestObserver;
+    private StreamObserver<ChatServiceOuterClass.MessageRequest> requestObserver;
+    private List<ChatServiceOuterClass.MessageResponse> messages;
 
     public ChatClient(final Channel channel) {
-        serviceStub = ChatServiceGrpc.newStub(channel);
-        requestObserver = serviceStub.sendMessage(new MessageObserver());
+        messages = new ArrayList<>();
+        requestObserver = ChatServiceGrpc.newStub(channel).sendMessage(new ChatLog(messages));
     }
 
     public void sendMessage(final String message, final int clientId) {
+        messages.removeAll(messages);
         try {
             requestObserver.onNext(ChatServiceOuterClass.MessageRequest.newBuilder()
                     .setMessage(message)
@@ -29,5 +33,21 @@ public class ChatClient {
 
     public void closeClient() {
         requestObserver.onCompleted();
+    }
+
+    public List<ChatServiceOuterClass.MessageResponse> getMessages() {
+        return messages;
+    }
+
+    public boolean hasMessages() {
+        try {
+            return getLastMessage().hasIsLast() && getLastMessage().getIsLast();
+        } catch (final IndexOutOfBoundsException e) {
+            return false;
+        }
+    }
+
+    private ChatServiceOuterClass.MessageResponse getLastMessage() {
+        return messages.get(messages.size() - 1);
     }
 }

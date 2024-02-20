@@ -1,5 +1,7 @@
 option java_package = "chatapp.ChatService";
 
+import "google/protobuf/timestamp.proto";
+
 service ChatService {
   rpc sendMessage(stream MessageRequest) returns (stream MessageResponse){}
 }
@@ -12,6 +14,8 @@ message MessageRequest {
 
 message MessageResponse {
   optional string username = 1;
-  optional int64 timestamp = 2;
+  optional google.protobuf.Timestamp timestamp = 2;
   optional string message = 3;
+  optional bool isLast = 4;
+  optional int32 messageId = 5;
 }
