@@ -11,7 +11,11 @@ public class SenderMain {
     static final int TIMEOUT = 5;
     static final int PORT = Integer.parseInt(System.getenv("CHAT_PORT"));
 
+    @SuppressWarnings("checkstyle:MagicNumber")
+
+
     public static void main(final String[] args) throws Exception {
+
         ManagedChannel channel =
                 Grpc.newChannelBuilder("localhost:" + PORT, InsecureChannelCredentials.create()).build();
 

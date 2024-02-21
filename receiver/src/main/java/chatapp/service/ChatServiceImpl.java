@@ -1,9 +1,9 @@
 package chatapp.service;
 
 import chatapp.ChatService.ChatServiceGrpc;
-
 import chatapp.ChatService.ChatServiceOuterClass;
 import chatapp.server.UserRepository;
+import com.google.protobuf.Timestamp;
 import io.grpc.stub.StreamObserver;
 
 import java.time.Instant;
@@ -34,10 +34,21 @@ public class ChatServiceImpl extends ChatServiceGrpc.ChatServiceImplBase {
 
                 final var user = state.findById(request.getUserId());
 
+                final var time = Instant.now();
+                final Timestamp ts =
+                        Timestamp.newBuilder().setSeconds(time.getEpochSecond()).setNanos(time.getNano()).build();
+
+                if (!messages.isEmpty()) {
+                    final var message = messages.get(messages.size() - 1);
+                    messages.set(message.getMessageId(), message.toBuilder().setIsLast(false).build());
+                }
+
                 messages.add(ChatServiceOuterClass.MessageResponse.newBuilder()
                         .setMessage(request.getMessage())
                         .setUsername(user.username())
-                        .setTimestamp(Instant.now().getEpochSecond())
+                        .setTimestamp(ts)
+                        .setIsLast(true)
+                        .setMessageId(messages.size())
                         .build());
 
                 streams.forEach(s -> {
