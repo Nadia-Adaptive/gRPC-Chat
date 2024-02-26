@@ -3,6 +3,7 @@ option java_package = "chatapp.ChatService";
 import "google/protobuf/timestamp.proto";
 
 service ChatService {
+  rpc connect(stream MessageRequest) returns (stream MessageResponse){}
   rpc sendMessage(stream MessageRequest) returns (stream MessageResponse){}
 }
 
