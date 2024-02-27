@@ -6,16 +6,28 @@ plugins {
 
 def protocVersion = '3.21.12'
 def grpcVersion = libs.versions.grpc.get()
-
+def reactiveGrpcVersion = '1.2.0'
 
 protobuf {
     protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
     plugins {
         grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
+        reactor {
+            artifact = "com.salesforce.servicelibs:reactor-grpc:${reactiveGrpcVersion}"
+        }
     }
     generateProtoTasks {
-        all()*.plugins { grpc {} }
+        all()*.plugins {
+            grpc {}
+            reactor {}
+        }
     }
+}
+
+dependencies {
+    implementation("com.salesforce.servicelibs:reactor-grpc-stub:${reactiveGrpcVersion}")
+    implementation platform('io.projectreactor:reactor-bom:2023.0.3')
+    implementation 'io.projectreactor:reactor-core:3.6.3'
 }
 
 // Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.

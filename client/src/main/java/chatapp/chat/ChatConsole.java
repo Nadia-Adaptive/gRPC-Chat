@@ -1,118 +1,87 @@
 package chatapp.chat;
 
-import chatapp.RoomService.ChatRoomServiceOuterClass.GetChatRoomResponse;
-import chatapp.chatroom.Room;
-import chatapp.chatroom.RoomQueue;
-import chatapp.connection.ChatChannel;
+import chatapp.chatroom.ChatRoom;
+import chatapp.chatroom.GetChatRoomService;
+import chatapp.chatroom.JoinRoomService;
 import chatapp.connection.ChatConnection;
-import io.grpc.Channel;
 
-import java.time.Instant;
 import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class ChatConsole {
-    ChatClient chatService;
-    RoomQueue roomQueue;
+    ChatRoom room = null;
 
-    Room room = null;
-
-    public ChatConsole(final Channel channel) {
-        roomQueue = new RoomQueue(channel);
+    public ChatConsole() {
     }
 
     public void runChat(final Scanner scanner) {
-        chatService = new ChatClient(ChatChannel.getChannel());
-        final var handler = chatService.getHandler();
+        final var handler = new SendMessageService();
+        final var getMessages = new GetMessagesService();
         clearChat();
-        System.out.println("Enter your message: ");
 
-        ExecutorService watchStreamExecutor = Executors.newSingleThreadExecutor();
+        handler.submit((messages) -> {
+            clearChat();
+            System.out.println("Room %s====".formatted(room.roomName()));
 
-        watchStreamExecutor.submit(() -> {
-            while (!handler.hasClosed()) {
-                if (handler.hasMessages()) {
-                    clearChat();
-                    System.out.println("Room %s====".formatted(room.roomName()));
+            messages.forEach(this::printMessage);
+            System.out.println("Enter your message: ");
+        });
 
-                    handler.getMessages().forEach(m -> printMessage(new Message(m.getUsername(), m.getMessage(),
-                            Instant.ofEpochSecond(m.getTimestamp().getSeconds()))));
+        getMessages.submit((messages) -> {
+            clearChat();
+            System.out.println("Room %s====".formatted(room.roomName()));
 
-                    handler.clearMessages();
-                    System.out.println("Enter your message: ");
-                }
-            }
+            messages.forEach(this::printMessage);
+            System.out.println("Enter your message: ");
         });
 
         while (!handler.hasClosed()) {
+            System.out.println("Enter your message: ");
             final var message = scanner.nextLine();
             System.out.println();
 
             if (message.equalsIgnoreCase("q")) {
-                chatService.closeClient();
+                handler.closeService();
                 break;
             }
 
             try {
-                System.out.println();
-                handler.clearMessages();
-                chatService.sendMessage(message, room.roomId());
+                handler.sendMessage(message);
             } catch (final Exception e) {
                 System.out.println(e.getMessage());
             }
         }
-
-        watchStreamExecutor.shutdownNow();
     }
 
     public void joinRoom(final Scanner scanner) {
+        final var joinRoomService = new JoinRoomService();
+        final var getChatRoomService = new GetChatRoomService();
         final var roomPrompt = "Choose a room to join";
-        clearChat();
-        System.out.println("==== Available rooms");
-        Future<Room> roomRequest = null;
 
-        try (ExecutorService watchStreamExecutor = Executors.newSingleThreadExecutor()) {
-            while (true) {
-                roomQueue.processQueue((final GetChatRoomResponse response) -> System.out.println(
-                        response.getRoomId() + ": " + response.getRoomName()));
-                System.out.println(roomPrompt);
-                final var roomId = scanner.nextLine();
-                System.out.println();
+        getChatRoomService.submit((r) -> {
+            System.out.println("==== Available rooms");
+            r.forEach(this::printRoom);
+        });
 
-                if (roomId.equalsIgnoreCase("q")) {
-                    break;
-                }
+        joinRoomService.submit((r) -> {
+            this.room = r;
+            ChatConnection.roomId = r.roomId();
+        });
 
-                try {
-                    roomQueue.joinRoom(Integer.parseInt(roomId));
-                    roomRequest = watchStreamExecutor.submit(() -> {
-                        while (!roomQueue.isReady()) {
-                            clearChat();
-                            System.out.println("Entering chat room.");
-                        }
-                        return roomQueue.getJoinResponse();
-                    });
-                    watchStreamExecutor.shutdown();
-                    break;
-                } catch (final NumberFormatException e) {
-                    System.out.println("Error parsing.");
-                }
+        getChatRoomService.getRooms();
+        while (!joinRoomService.hasClosed()) {
+            clearChat();
+            System.out.println(roomPrompt);
+            final var roomId = scanner.nextLine();
+            System.out.println();
 
+            if (roomId.equalsIgnoreCase("q")) {
+                break;
             }
-
-            this.room = roomRequest.get();
-            ChatConnection.roomId = room.roomId();
-        } catch (final ExecutionException | InterruptedException | NullPointerException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void close() {
-        if (chatService != null) {
-            chatService.closeClient();
+            try {
+                joinRoomService.joinRoom(Integer.parseInt(roomId));
+            } catch (final NumberFormatException e) {
+                System.out.println("Error parsing.");
+            }
         }
     }
 
@@ -120,6 +89,10 @@ public class ChatConsole {
         System.out.println();
         System.out.println("%s [%s]".formatted(m.username(), m.timestamp()));
         System.out.println("\t" + m.message());
+    }
+
+    private void printRoom(final ChatRoom r) {
+        System.out.println(r.roomId() + ": " + r.roomName());
     }
 
     private void clearChat() {
