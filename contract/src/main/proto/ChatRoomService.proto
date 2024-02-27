@@ -4,10 +4,10 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 service  ChatRoomService {
-  rpc joinChatRoom(JoinChatRoomRequest) returns (JoinChatRoomResponse){}
+  rpc joinChatRoom(JoinChatRoomRequest) returns (ChatRoomResponse){}
   rpc createChatRoom(CreateChatRoomRequest) returns (CreateChatRoomResponse){}
   rpc removeChatRoom(RemoveChatRoomRequest) returns (stream RemoveChatRoomResponse){}
-  rpc getChatRooms(google.protobuf.Empty) returns (stream GetChatRoomResponse);
+  rpc getChatRooms(stream google.protobuf.Empty) returns (stream GetChatRoomResponse);
 }
 
 message JoinChatRoomRequest {
@@ -15,7 +15,7 @@ message JoinChatRoomRequest {
   optional int32 userId = 2;
 }
 
-message JoinChatRoomResponse {
+message ChatRoomResponse {
   optional string roomName = 1;
   optional int32 roomId = 2;
 }
@@ -41,6 +41,6 @@ message RemoveChatRoomResponse {
 }
 
 message GetChatRoomResponse {
-  optional string roomName = 1;
-  optional int32 roomId = 2;
+  repeated ChatRoomResponse rooms = 1;
+  optional bool isInitialData = 2;
 }

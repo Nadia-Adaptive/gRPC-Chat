@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 public class SenderMain {
     static final int TIMEOUT = 5;
     static final int PORT = Integer.parseInt(System.getenv("CHAT_PORT"));
-
     public static void main(final String[] args) throws Exception {
         ManagedChannel channel =
                 Grpc.newChannelBuilder("localhost:" + PORT, InsecureChannelCredentials.create())
@@ -26,16 +25,13 @@ public class SenderMain {
         try (Scanner scanner = new Scanner(System.in)) {
             connection.login(scanner);
             if (ChatConnection.isConnected) {
-                console = new ChatConsole(channel);
+                console = new ChatConsole();
                 console.joinRoom(scanner);
                 console.runChat(scanner);
             }
         } finally {
             channel.shutdownNow().awaitTermination(TIMEOUT, TimeUnit.SECONDS);
 
-            if (console != null) {
-                console.close();
-            }
             System.out.println("Closing Client");
         }
     }

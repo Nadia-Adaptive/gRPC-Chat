@@ -13,3 +13,8 @@ application {
     // Define the main class for the application.
     mainClass = 'ReceiverMain'
 }
+
+dependencies {
+    implementation platform('io.projectreactor:reactor-bom:2023.0.3')
+    implementation 'io.projectreactor:reactor-core:3.6.3'
+}
