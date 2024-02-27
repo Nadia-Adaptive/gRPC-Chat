@@ -8,7 +8,7 @@
  */
 
 rootProject.name = 'grpc-chat'
-include('receiver', 'sender', 'contract')
+include('server', 'client', 'contract')
 
 dependencyResolutionManagement {
     versionCatalogs {
