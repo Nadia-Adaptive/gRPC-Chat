@@ -2,14 +2,14 @@ option java_package = "chatapp.ChatService";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "ResponseResult.proto";
 
 service ChatService {
-  rpc connect(stream MessageRequest) returns (stream MessageResponse){}
-  rpc sendMessage(MessageRequest) returns (google.protobuf.Empty){}
+  rpc sendMessage(SendMessageRequest) returns (MessageResponse){}
   rpc getMessages(stream google.protobuf.Empty) returns (stream MessagesResponse){}
 }
 
-message MessageRequest {
+message SendMessageRequest {
   optional int32 roomId = 1;
   optional int32 userId = 2;
   optional string message = 3;

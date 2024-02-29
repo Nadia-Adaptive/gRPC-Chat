@@ -2,9 +2,8 @@ package chatapp.connection;
 
 import chatapp.ConnectionService.ConnectionServiceGrpc;
 import chatapp.ConnectionService.ConnectionServiceOuterClass;
+import chatapp.console.ApplicationDisplay;
 import io.grpc.Channel;
-
-import java.util.Scanner;
 
 public class ChatConnection {
     public static boolean isConnected;
@@ -19,11 +18,11 @@ public class ChatConnection {
         clientId = Integer.MIN_VALUE;
     }
 
-    public void login(final Scanner scanner) {
+    public void login(final ApplicationDisplay display) {
         while (true) {
             System.out.println();
             System.out.println("Enter your username");
-            final var username = scanner.nextLine();
+            final var username = display.readString();
 
             if (username.equalsIgnoreCase("q")) {
                 break;

@@ -26,7 +26,6 @@ protobuf {
 
 dependencies {
     implementation("com.salesforce.servicelibs:reactor-grpc-stub:${reactiveGrpcVersion}")
-    implementation platform('io.projectreactor:reactor-bom:2023.0.3')
     implementation 'io.projectreactor:reactor-core:3.6.3'
 }
 
