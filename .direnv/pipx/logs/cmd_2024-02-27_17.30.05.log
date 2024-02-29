@@ -1,0 +1,9 @@
+   538.1ms (setup:755): 2024-02-27 17:30:05
+   538.1ms (setup:756): /Users/nadia.aina/Library/Python/3.9/bin/pipx upgrade-all
+   538.2ms (setup:757): pipx version is 1.1.0
+   538.2ms (setup:758): Default python interpreter is '/Library/Developer/CommandLineTools/usr/bin/python3'
+   538.2ms (mkdir:81): creating directory /Users/nadia.aina/repos/BE-training/grpc-chat/initial/.direnv/pipx/venvs
+   538.2ms (mkdir:81): creating directory /Users/nadia.aina/repos/BE-training/grpc-chat/initial/.direnv/pipx/bin
+   538.3ms (mkdir:81): creating directory /Users/nadia.aina/repos/BE-training/grpc-chat/initial/.direnv/pipx/.cache
+   538.4ms (setup:766): Adding CACHEDIR.TAG to cache directory
+   538.5ms (cli:830): pipx finished.

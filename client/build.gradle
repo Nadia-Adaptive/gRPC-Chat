@@ -17,4 +17,5 @@ application {
 dependencies {
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     implementation 'io.projectreactor:reactor-core:3.6.3'
+    testImplementation 'org.mockito:mockito-core:5.10.0'
 }

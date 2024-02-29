@@ -1,8 +1,8 @@
 package chatapp.chat;
 
-import chatapp.ChatService.ChatServiceOuterClass.MessageRequest;
 import chatapp.ChatService.ChatServiceOuterClass.MessageResponse;
 import chatapp.ChatService.ChatServiceOuterClass.MessagesResponse;
+import chatapp.ChatService.ChatServiceOuterClass.SendMessageRequest;
 import chatapp.ChatService.ReactorChatServiceGrpc.ChatServiceImplBase;
 import chatapp.room.ChatRoomRepository;
 import chatapp.server.RequestHeader;
@@ -31,9 +31,7 @@ public class ChatServiceImpl extends ChatServiceImplBase {
 
 
     @Override
-    public Mono<Empty> sendMessage(final Mono<MessageRequest> request) {
-        System.out.println("Adding new client.");
-
+    public Mono<MessageResponse> sendMessage(final Mono<SendMessageRequest> request) {
         final var clientId = RequestHeader.CTX_CLIENT_ID.get();
         final var roomId = RequestHeader.CTX_ROOM_ID.get();
 
@@ -46,12 +44,14 @@ public class ChatServiceImpl extends ChatServiceImplBase {
         System.out.println("Sending updated messages");
 
         return request.map((m) -> {
-            room.messages().add(mapToMessage(m.toBuilder().setUserId(clientId).build()));
+            final var message = mapToMessage(m.toBuilder().setUserId(clientId).build());
+            room.messages().add(message);
             final var messages = mapToMessagesResponse(room.messages());
 
-            messageSink.tryEmitNext(messages);
+            final var result = messageSink.tryEmitNext(messages);
 
-            return Empty.newBuilder().build();
+            return result.isSuccess() ? mapToMessageResponse(message)
+                    : mapToMessageResponse(new Message(-1, -1, null, null, null));
         });
     }
 
@@ -72,7 +72,6 @@ public class ChatServiceImpl extends ChatServiceImplBase {
     }
 
     private MessageResponse mapToMessageResponse(final Message message) {
-        System.out.println(message.message());
         final boolean isLast =
                 message.messageId() != chatRoomRepository.findById(message.roomId()).messages().size() - 1;
         final var time = message.timestamp();
@@ -93,7 +92,7 @@ public class ChatServiceImpl extends ChatServiceImplBase {
                 .build();
     }
 
-    private Message mapToMessage(final MessageRequest request) {
+    private Message mapToMessage(final SendMessageRequest request) {
         final var user = userRepository.findById(request.getUserId());
         final var room = chatRoomRepository.findById(request.getRoomId());
 

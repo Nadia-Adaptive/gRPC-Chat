@@ -1,60 +1,54 @@
 package chatapp.chat;
 
-import chatapp.ChatService.ChatServiceOuterClass;
+import chatapp.ChatService.ChatServiceOuterClass.SendMessageRequest;
 import chatapp.ChatService.ChatServiceOuterClass.MessageResponse;
-import chatapp.ChatService.ChatServiceOuterClass.MessagesResponse;
 import chatapp.ChatService.ReactorChatServiceGrpc;
 import chatapp.ChatService.ReactorChatServiceGrpc.ReactorChatServiceStub;
 import chatapp.connection.ChatChannel;
+import chatapp.service.ReactiveService;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
-import java.util.List;
 import java.util.function.Consumer;
 
-public class SendMessageService {
-    private boolean hasClosed = false;
-    private Consumer<List<Message>> callback;
+import static chatapp.chat.ChatMessageMapper.mapToMessage;
+
+public class SendMessageService implements ReactiveService<ChatMessage> {
+    private Consumer<ChatMessage> callback;
+    private Consumer<Throwable> errorHandler;
     private Disposable responseStream;
 
     public SendMessageService() {
-
     }
 
     public void sendMessage(final String message) {
         final ReactorChatServiceStub stub = ReactorChatServiceGrpc.newReactorStub(ChatChannel.getChannel());
 
-        responseStream = Mono.just(ChatServiceOuterClass.MessageRequest.newBuilder()
-                .setMessage(message)
-                .build()).transform(stub::sendMessage).doOnError(this::reportError).subscribe();
+        responseStream = Mono
+                .just(SendMessageRequest.newBuilder()
+                        .setMessage(message)
+                        .build())
+                .transform(stub::sendMessage)
+                .subscribe(this::processMessage, this.errorHandler);
     }
 
-    private void processMessage(final MessagesResponse m) {
-        callback.accept(m.getMessagesList().stream().map(this::mapToMessage).toList());
+    private void processMessage(final MessageResponse m) {
+        if (callback != null) {
+            callback.accept(mapToMessage(m));
+        }
+    }
+    @Override
+    public void setErrorHandler(final Consumer<Throwable> t) {
+        this.errorHandler = t;
     }
 
-    private Message mapToMessage(final MessageResponse response) {
-        return new Message(response.getUsername(), response.getMessage(),
-                Instant.ofEpochSecond(response.getTimestamp().getSeconds()));
+    @Override
+    public void setSuccessHandler(final Consumer<ChatMessage> t) {
+        this.callback = t;
     }
 
-    private void reportError(final Throwable t) {
-        System.out.println("Error - " + t.getMessage());
-        System.out.println("Closing chat.");
-        hasClosed = true;
-    }
-
-    public boolean hasClosed() {
-        return hasClosed;
-    }
-
+    @Override
     public void closeService() {
-       hasClosed = true;
-       responseStream.dispose();
-    }
-
-    public void submit(final Consumer<List<Message>> processMessages) {
-        callback = processMessages;
+        responseStream.dispose();
     }
 }

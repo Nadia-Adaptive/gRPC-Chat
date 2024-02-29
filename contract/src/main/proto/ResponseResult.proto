@@ -1,0 +1,6 @@
+option java_package = "chatapp.service";
+
+
+message ResponseResult {
+    optional bool isSuccess = 1;
+}
